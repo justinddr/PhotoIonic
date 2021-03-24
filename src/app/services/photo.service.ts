@@ -8,6 +8,25 @@ import { Plugins, CameraResultType, Capacitor, FilesystemDirectory,
   providedIn: 'root'
 })
 export class PhotoService {
+  public photos: Photo[] = [];
+  
+  public async addNewToGallery() {
+    // Take a photo
+    const capturedPhoto = await Camera.getPhoto({
+      resultType: CameraResultType.Uri, 
+      source: CameraSource.Camera, 
+      quality: 100 
+    });
+  
+    this.photos.unshift({
+      filepath: "soon...",
+      webviewPath: capturedPhoto.webPath
+    });
+  }
 
   constructor() { }
+}
+export interface Photo {
+  filepath: string;
+  webviewPath: string;
 }
