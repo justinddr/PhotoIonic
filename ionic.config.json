@@ -1,0 +1,7 @@
+{
+  "name": "photoAngular",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
