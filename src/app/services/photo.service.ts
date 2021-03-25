@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Plugins, CameraResultType, Capacitor, FilesystemDirectory, 
   CameraPhoto, CameraSource } from '@capacitor/core';
-
+  import { Platform } from '@ionic/angular';
   const { Camera, Filesystem, Storage } = Plugins;
   
 
@@ -15,11 +15,23 @@ export class PhotoService {
      
 
   private async readAsBase64(cameraPhoto: CameraPhoto) {
-    // Fetch the photo, read as a blob, then convert to base64 format
-    const response = await fetch(cameraPhoto.webPath!);
-    const blob = await response.blob();
+
+
+    if (this.platform.is('hybrid')) {
+      // Read the file into base64 format
+      const file = await Filesystem.readFile({
+        path: cameraPhoto.path
+      });
   
-    return await this.convertBlobToBase64(blob) as string;  
+      return file.data;
+    }
+    else {
+      // Fetch the photo, read as a blob, then convert to base64 format
+      const response = await fetch(cameraPhoto.webPath);
+      const blob = await response.blob();
+  
+      return await this.convertBlobToBase64(blob) as string;
+    }
   }
   
   convertBlobToBase64 = (blob: Blob) => new Promise((resolve, reject) => {
@@ -52,9 +64,11 @@ export class PhotoService {
    }
   public photos: Photo[] = [];
   private PHOTO_STORAGE: string = "photos";
+  
   public async addNewToGallery() {
 
-    
+   
+  
     const capturedPhoto = await Camera.getPhoto({
       resultType: CameraResultType.Uri, // file-based data; provides best performance
       source: CameraSource.Camera, // automatically take a new photo with the camera
@@ -72,6 +86,7 @@ export class PhotoService {
        }
   
        public async loadSaved() {
+         console.log("loading")
         // Retrieve cached photo array data
         const photoList = await Storage.get({ key: this.PHOTO_STORAGE });
         this.photos = JSON.parse(photoList.value) || [];
@@ -89,9 +104,12 @@ export class PhotoService {
           }
       }
     
-  
+      private platform: Platform;
 
-  constructor() { }
+      constructor(platform: Platform) {
+        this.platform = platform;
+      }
+    
 }
 export interface Photo {
   filepath: string;

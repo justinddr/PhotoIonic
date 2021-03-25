@@ -11,10 +11,11 @@ export class Tab2Page {
   constructor(public photoService: PhotoService) { }
   async ngOnInit() {
     await this.photoService.loadSaved();
+    console.log("test")
   }
 addPhotoToGallery() {
   this.photoService.addNewToGallery();
-  console.log("test");
+  
 }
 
 }
